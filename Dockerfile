@@ -1,5 +1,5 @@
 FROM python:3.9.16-alpine3.18
-#FROM python:3.10
+#FROM python:3
 
 #Инструкция WORKDIR задаёт рабочую папку приложения.
 #Все инструкции в Dockerfile будут выполняться относительно неё.
