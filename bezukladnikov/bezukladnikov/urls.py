@@ -22,5 +22,4 @@ from my_page.views import index, project
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('my_page.urls')),
-
 ]
