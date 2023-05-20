@@ -5,6 +5,9 @@ COUNT_PROJECT = 5
 def index(request):
     return HttpResponse("Главная страница биографии обо мне")
 
+def all_project(request):
+    return HttpResponse(f"<h1>All my project</h1>")
+
 def project(request, proj_id):
     if proj_id < 1 or proj_id > COUNT_PROJECT:
         return redirect('home', permanent=False)
