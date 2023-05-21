@@ -1,12 +1,19 @@
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect
 
+from .models import Project
+
 COUNT_PROJECT = 5
+menu = ["About me", "My project", "Contact"]
 def index(request):
-    return HttpResponse("Главная страница биографии обо мне")
+    return render(request, 'my_page/index.html', {'menu': menu, 'title': 'Main page'}) # Джанго сам найдет путь по настройкам в settings
+
+def about(request):
+    return render(request, 'my_page/about.html', {'menu': menu, 'title': 'About site'})
 
 def all_project(request):
-    return HttpResponse(f"<h1>All my project</h1>")
+    projects = Project.objects.all()
+    return render(request, 'my_page/project.html', {'projects': projects, 'menu': menu, 'title': 'My project'})
 
 def project(request, proj_id):
     if proj_id < 1 or proj_id > COUNT_PROJECT:
