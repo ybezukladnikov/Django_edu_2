@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from .models import Project
 
 COUNT_PROJECT = 5
-menu = ["About me", "My project", "Contact"]
+menu = ["About me", "My project", "Contacts"]
 def index(request):
     return render(request, 'my_page/index.html', {'menu': menu, 'title': 'Main page'}) # Джанго сам найдет путь по настройкам в settings
 
