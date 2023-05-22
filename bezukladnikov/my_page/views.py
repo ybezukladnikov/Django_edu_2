@@ -4,12 +4,41 @@ from django.shortcuts import render, redirect
 from .models import Project
 
 COUNT_PROJECT = 5
-menu = ["About me", "Experience", "My project", "Contacts"]
+# menu = ["About me", "Experience", "My project", "Contacts"]
+
+menu = [{'title': "О сайте", 'url_name': "about"},
+        {'title': "Добавить статью", 'url_name': "add_page"},
+        {'title': "Обратная связь", 'url_name': "contact"},
+        {'title': "Войти", 'url_name': "login"}
+]
+
+
+
 def index(request):
-    return render(request, 'my_page/index.html', {'menu': menu, 'title': 'Main page'}) # Джанго сам найдет путь по настройкам в settings
+    posts = Project.objects.all()
+    context = {
+        'posts': posts,
+        'menu': menu,
+        'title': 'Main page'
+    }
+    return render(request, 'my_page/index.html', context=context) # Джанго сам найдет путь по настройкам в settings
 
 def about(request):
     return render(request, 'my_page/about.html', {'menu': menu, 'title': 'About site'})
+
+
+def addpage(request):
+    return HttpResponse("Добавление статьи")
+
+def contact(request):
+    return HttpResponse("Обратная связь")
+
+def login(request):
+    return HttpResponse("Авторизация")
+
+def show_post(request, post_id):
+    return HttpResponse(f"Отображение статьи с id {post_id}")
+
 
 def all_project(request):
     projects = Project.objects.all()

@@ -6,7 +6,11 @@ urlpatterns = [
 
     path('', index, name='home'),
     path('about/', about, name='about'),
-    path('project/', all_project),
-    path('project/<int:proj_id>/', project),
+    path('addpage/', addpage, name='add_page'),
+    path('contact/', contact, name='contact'),
+    path('login/', login, name='login'),
+    path('post/<int:post_id>/', show_post, name='post'),
+    # path('project/', all_project, name='my_project'),
+    # path('project/<int:proj_id>/', project),
 
 ]
