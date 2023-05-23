@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render, redirect
 
-from .models import Project
+from .models import Project, Category
 
 COUNT_PROJECT = 5
 # menu = ["About me", "Experience", "My project", "Contacts"]
@@ -16,6 +16,7 @@ menu = [{'title': "О сайте", 'url_name': "about"},
 
 def index(request):
     posts = Project.objects.all()
+    cat = Category.objects.all()
     context = {
         'posts': posts,
         'menu': menu,
