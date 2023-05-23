@@ -1,5 +1,6 @@
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect
+
 
 from .models import Project, Category
 
@@ -16,11 +17,13 @@ menu = [{'title': "О сайте", 'url_name': "about"},
 
 def index(request):
     posts = Project.objects.all()
-    cat = Category.objects.all()
+    cats = Category.objects.all()
     context = {
         'posts': posts,
+        'cats': cats,
         'menu': menu,
-        'title': 'Main page'
+        'title': 'Main page',
+        'cat_selected': 0,
     }
     return render(request, 'my_page/index.html', context=context) # Джанго сам найдет путь по настройкам в settings
 
@@ -39,6 +42,23 @@ def login(request):
 
 def show_post(request, post_id):
     return HttpResponse(f"Отображение статьи с id {post_id}")
+
+def show_category(request, cat_id):
+    posts = Project.objects.filter(cat_id=cat_id)
+    cats = Category.objects.all()
+
+    if len(posts) == 0:
+        raise Http404()
+
+    context = {
+        'posts': posts,
+        'cats': cats,
+        'menu': menu,
+        'title': 'Отображение по рубрикам',
+        'cat_selected': cat_id,
+    }
+
+    return render(request, 'my_page/index.html', context=context)
 
 
 def all_project(request):
