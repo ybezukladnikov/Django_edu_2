@@ -16,6 +16,11 @@ class Project(models.Model):
     def get_absolute_url(self):
         return reverse('post', kwargs={'post_id': self.pk})
 
+    class Meta:
+        verbose_name = 'Лучшие проекты'
+        verbose_name_plural = 'Лучшие проекты'
+        ordering = ['time_create', 'title']
+
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True)
 
