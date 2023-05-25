@@ -34,9 +34,9 @@
 	<td valign="top" class="left-chapters">
 	<ul id="leftchapters">
 {% if cat_selected == 0 %}
-		<li class="selected">Все категории</li>
+		<li class="selected">All Cities</li>
 {% else %}
-		<li><a href="{% url 'home' %}">Все категории</a></li>
+		<li><a href="{% url 'home' %}">All Cities</a></li>
 {% endif %}
 
 {% for c in cats %}

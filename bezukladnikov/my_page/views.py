@@ -2,22 +2,22 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect
 
 
-from .models import Project, Category
+from .models import SportsGround, City
 
 COUNT_PROJECT = 5
-# menu = ["About me", "Experience", "My project", "Contacts"]
 
-menu = [{'title': "О сайте", 'url_name': "about"},
-        {'title': "Добавить статью", 'url_name': "add_page"},
-        {'title': "Обратная связь", 'url_name': "contact"},
-        {'title': "Войти", 'url_name': "login"}
+
+menu = [{'title': "About", 'url_name': "about"},
+        {'title': "Add Sport Ground", 'url_name': "add_page"},
+        {'title': "Feedback", 'url_name': "contact"},
+        {'title': "Sign in", 'url_name': "login"}
 ]
 
 
 
 def index(request):
-    posts = Project.objects.all()
-    cats = Category.objects.all()
+    posts = SportsGround.objects.all()
+    cats = City.objects.all()
     context = {
         'posts': posts,
         'cats': cats,
@@ -44,8 +44,8 @@ def show_post(request, post_id):
     return HttpResponse(f"Отображение статьи с id {post_id}")
 
 def show_category(request, cat_id):
-    posts = Project.objects.filter(cat_id=cat_id)
-    cats = Category.objects.all()
+    posts = SportsGround.objects.filter(cat_id=cat_id)
+    cats = City.objects.all()
 
     if len(posts) == 0:
         raise Http404()
@@ -62,7 +62,7 @@ def show_category(request, cat_id):
 
 
 def all_project(request):
-    projects = Project.objects.all()
+    projects = SportsGround.objects.all()
     return render(request, 'my_page/project.html', {'projects': projects, 'menu': menu, 'title': 'My project'})
 
 def project(request, proj_id):
