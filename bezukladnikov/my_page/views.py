@@ -16,7 +16,8 @@ menu = [{'title': "About", 'url_name': "about"},
 
 
 def index(request):
-    posts = SportsGround.objects.all()
+    # posts = SportsGround.objects.all()
+    posts = SportsGround.objects.all().filter(is_published=1)
     cats = City.objects.all()
     context = {
         'posts': posts,
@@ -44,7 +45,7 @@ def show_post(request, post_id):
     return HttpResponse(f"Отображение статьи с id {post_id}")
 
 def show_category(request, cat_id):
-    posts = SportsGround.objects.filter(cat_id=cat_id)
+    posts = SportsGround.objects.filter(city=cat_id).filter(is_published=1)
     cats = City.objects.all()
 
     if len(posts) == 0:
