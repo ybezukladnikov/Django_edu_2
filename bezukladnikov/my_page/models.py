@@ -22,10 +22,15 @@ class Project(models.Model):
         ordering = ['time_create', 'title']
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, db_index=True)
+    name = models.CharField(max_length=100, db_index=True, verbose_name='City')
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse('category', kwargs={'cat_id': self.pk})
+
+    class Meta:
+        verbose_name = 'City'
+        verbose_name_plural = 'Cities'
+        ordering = ['id',]
