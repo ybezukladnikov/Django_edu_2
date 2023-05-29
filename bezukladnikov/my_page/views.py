@@ -61,13 +61,13 @@ def show_category(request, cat_slug):
     city_id = city_obj[0].pk
     posts = SportsGround.objects.filter(city=city_id).filter(is_published=1)
 
-    if len(posts) is 0:
+    if len(posts) == 0:
         raise Http404()
 
     context = {
         'posts': posts,
         'menu': menu,
-        'title': 'Отображение по рубрикам',
+        'title': 'Grounds in cities',
         'cat_selected': city_id,
     }
 
