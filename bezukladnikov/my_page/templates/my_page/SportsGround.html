@@ -1,0 +1,14 @@
+{% extends 'my_page/base.html' %}
+
+{% block content %}
+
+<h1>{{sports_ground.title}}</h1>
+
+{% if sports_ground.photo %}
+<p><img class="img-article-left" src="{{sports_ground.photo.url}}"></p>
+{% endif %}
+
+<!--фильтр linebreaks добавляет теги абзаца.-->
+{{sports_ground.content|linebreaks}}
+
+{% endblock %}

@@ -1,18 +1,15 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
-from django.shortcuts import render, redirect
-
+from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import SportsGround, City
 
 COUNT_PROJECT = 5
 
-
 menu = [{'title': "About", 'url_name': "about"},
         {'title': "Add Sport Ground", 'url_name': "add_page"},
         {'title': "Feedback", 'url_name': "contact"},
         {'title': "Sign in", 'url_name': "login"}
-]
-
+        ]
 
 
 def index(request):
@@ -24,7 +21,8 @@ def index(request):
         'title': 'Main page',
         'cat_selected': 0,
     }
-    return render(request, 'my_page/index.html', context=context) # Джанго сам найдет путь по настройкам в settings
+    return render(request, 'my_page/index.html', context=context)  # Джанго сам найдет путь по настройкам в settings
+
 
 def about(request):
     return render(request, 'my_page/about.html', {'menu': menu, 'title': 'About site'})
@@ -33,18 +31,35 @@ def about(request):
 def addpage(request):
     return HttpResponse("Добавление статьи")
 
+
 def contact(request):
     return HttpResponse("Обратная связь")
+
 
 def login(request):
     return HttpResponse("Авторизация")
 
-def show_post(request, post_id):
-    return HttpResponse(f"Отображение статьи с id {post_id}")
 
-def show_category(request, cat_id):
-    posts = SportsGround.objects.filter(city=cat_id).filter(is_published=1)
+def show_sports_ground(request, SportsGround_slug):
+    sports_ground = get_object_or_404(SportsGround, slug=SportsGround_slug)
 
+    context = {
+        'sports_ground': sports_ground,
+        'menu': menu,
+        'title': sports_ground.title,
+        #     Я бы закомментировал cat_selected. Потому что
+        #     если этого не сделать, то если я захочу после выбора площадки ознакомитсья
+        # со всеми площадками города к которой относится выбранная площадка я этого сделать
+        # уже не смогу. Потому город станет простым текстом, а не ссылкой.
+        'cat_selected': sports_ground.city_id,
+    }
+    return render(request, 'my_page/SportsGround.html', context=context)
+
+
+def show_category(request, cat_slug):
+    city_obj = City.objects.filter(slug=cat_slug)
+    city_id = city_obj[0].pk
+    posts = SportsGround.objects.filter(city=city_id).filter(is_published=1)
 
     if len(posts) is 0:
         raise Http404()
@@ -53,7 +68,7 @@ def show_category(request, cat_id):
         'posts': posts,
         'menu': menu,
         'title': 'Отображение по рубрикам',
-        'cat_selected': cat_id,
+        'cat_selected': city_id,
     }
 
     return render(request, 'my_page/index.html', context=context)
@@ -63,10 +78,12 @@ def all_project(request):
     projects = SportsGround.objects.all()
     return render(request, 'my_page/project.html', {'projects': projects, 'menu': menu, 'title': 'My project'})
 
+
 def project(request, proj_id):
     if proj_id < 1 or proj_id > COUNT_PROJECT:
         return redirect('home', permanent=False)
     return HttpResponse(f"<h1>Мои проекты</h1><p>Проект номер {proj_id}</p>")
+
 
 def pageNotFound(request, exception):
     return HttpResponseNotFound(f"<h1>Страница не найдена</h1>")

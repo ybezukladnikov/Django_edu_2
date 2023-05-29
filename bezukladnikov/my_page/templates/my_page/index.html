@@ -4,12 +4,19 @@
 <ul class="list-articles">
 	{% for p in posts %}
 			<li><div class="article-panel">
-	<p class="first">Категория: {{p.cat}}</p>
-	<p class="last">Дата: {{p.time_update|date:"d-m-Y H:i:s"}}</p>
+<!--				p.city это мы обращаемся к атребуту city записи в модели площадки.-->
+<!--				Так как это внешний ключ, то он выводит название соответствующей записи -->
+<!--				из таблицы города. Но так как мы переопределили метор __str__ в модели -->
+<!--				города, мы получаем название города. -->
+	<p class="first">City: {{p.city}}</p>
+	<p class="last">Date: {{p.time_update|date:"d-m-Y H:i:s"}}</p>
 </div>
 
 				{% if p.photo %}
+<!--				строчка src="{{p.photo.url}}". Атребут url возвращает url адрес путем прибавления -->
+<!--				в начало пути из переменной MEDIA_URL которая определена в файле settings-->
 				<p><img class="img-article-left thumb" src="{{p.photo.url}}"></p>
+
 				{% endif %}
 
 				<h2>{{p.title}}</h2>
@@ -17,7 +24,7 @@
 	{{p.content|linebreaks|truncatewords:50}}
 	{% endautoescape %}
 			<div class="clear"></div>
-			<p class="link-read-post"><a href="{{ p.get_absolute_url }}">Читать пост</a></p>
+			<p class="link-read-post"><a href="{{ p.get_absolute_url }}">See all page</a></p>
 			</li>
 	{% endfor %}
 </ul>
