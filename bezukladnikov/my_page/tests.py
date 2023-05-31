@@ -15,3 +15,8 @@ class TestMyPage(TestCase):
         response = self.client.get('')
         self.assertEqual(response.status_code, self.RIGHT_RESPONSE)
 
+
+    def test_raleigh(self):
+        response = self.client.get('/category/raleigh')
+        self.assertEqual(response.status_code, 301)
+

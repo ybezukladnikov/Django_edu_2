@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
 
+from .forms import *
 from .models import SportsGround, City
 
 COUNT_PROJECT = 5
@@ -29,7 +30,19 @@ def about(request):
 
 
 def addpage(request):
-    return HttpResponse("Добавление статьи")
+    if request.method == 'POST':
+        form = AddPostForm(request.POST) # Формируется форма с заполенными данными
+        if form.is_valid():
+            try:
+                SportsGround.objects.create(**form.cleaned_data)
+                return redirect('home')
+            except:
+                form.add_error(None, 'Error adding post')
+            # print(form.cleaned_data) # просто выведит в консоль данные, которые были введены в форму
+                                        # если они корректны.
+    else:
+        form = AddPostForm() # Формируется пустая форма
+    return render(request, 'my_page/addpage.html', {'form': form, 'menu': menu, 'title': 'Add page'})
 
 
 def contact(request):
