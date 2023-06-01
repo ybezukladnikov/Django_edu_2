@@ -31,15 +31,22 @@ def about(request):
 
 def addpage(request):
     if request.method == 'POST':
-        form = AddPostForm(request.POST) # Формируется форма с заполенными данными
+        form = AddPostForm(request.POST, request.FILES) # Формируется форма с заполенными данными и получение фото.
         if form.is_valid():
+            form.save()  # это сохранение если форма связанa c базой данных
+
+            '''
+            если форма не связа с базой данный:
             try:
-                SportsGround.objects.create(**form.cleaned_data)
+                SportsGround.objects.create(**form.cleaned_data) 
                 return redirect('home')
             except:
                 form.add_error(None, 'Error adding post')
+            '''
+
             # print(form.cleaned_data) # просто выведит в консоль данные, которые были введены в форму
                                         # если они корректны.
+            return redirect('home')
     else:
         form = AddPostForm() # Формируется пустая форма
     return render(request, 'my_page/addpage.html', {'form': form, 'menu': menu, 'title': 'Add page'})

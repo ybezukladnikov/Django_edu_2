@@ -2,8 +2,9 @@
 
 {% block content %}
 <h1>{{title}}</h1>
-
-<form action="{% url 'add_page' %}" method="post">
+<!--enctype="multipart/form-data" данный атребут обязательный если -->
+<!--на странице передаются фото любо другие файлы-->
+<form action="{% url 'add_page' %}" method="post" enctype="multipart/form-data">
 <!--  action - это атрибут формы, который говорит к какому url мы должны
 обратиться для обработки этой формы.
 {% url 'add_page' %} - отсылка на url адрес по имени.-->
