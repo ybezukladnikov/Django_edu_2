@@ -1,5 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import ListView, DetailView, CreateView
+from django.urls import reverse_lazy
 
 from .forms import *
 from .models import SportsGround, City
@@ -13,43 +15,78 @@ menu = [{'title': "About", 'url_name': "about"},
         ]
 
 
-def index(request):
-    # posts = SportsGround.objects.all()
-    posts = SportsGround.objects.all().filter(is_published=1)
-    context = {
-        'posts': posts,
-        'menu': menu,
-        'title': 'Main page',
-        'cat_selected': 0,
-    }
-    return render(request, 'my_page/index.html', context=context)  # Джанго сам найдет путь по настройкам в settings
+class MyPageHome(ListView):
+    model = SportsGround
+    template_name = 'my_page/index.html'
+    context_object_name = 'posts' # Класс использует свою коллекцию данных и она называется object_list.
+    # Но, так как у нас в index.html использутеся слово posts из старой функции, то нужно просто заменить
+    # имя.
+    extra_context = {'title': 'Main page'} # но это только для передачи статической информации.
+    # для динамической информации такой как список меню ввержу нужно уже использовать функцию.
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs) # сначала мы должны поднять к зазовому классу и забрать
+        # все коллекции, которые уже сформированы. Такие как posts, title.
+        context['menu'] = menu
+        context['cat_selected'] = 0
+        return context
+
+    def get_queryset(self):
+        return SportsGround.objects.filter(is_published=True)
+
+# def index(request):
+#     # posts = SportsGround.objects.all()
+#     posts = SportsGround.objects.all().filter(is_published=1)
+#     context = {
+#         'posts': posts,
+#         'menu': menu,
+#         'title': 'Main page',
+#         'cat_selected': 0,
+#     }
+#     return render(request, 'my_page/index.html', context=context)  # Джанго сам найдет путь по настройкам в settings
 
 
 def about(request):
     return render(request, 'my_page/about.html', {'menu': menu, 'title': 'About site'})
 
 
-def addpage(request):
-    if request.method == 'POST':
-        form = AddPostForm(request.POST, request.FILES) # Формируется форма с заполенными данными и получение фото.
-        if form.is_valid():
-            form.save()  # это сохранение если форма связанa c базой данных
+class AddPage(CreateView):
+    form_class = AddPostForm
+    template_name = 'my_page/addpage.html'
+    # Джанго автоматическии через функцию get_url, которая прописана в модели.
+    # Сформирует url для нового поста и перекинит меня туда. Но, если я хочу, чтобы после
+    # добавления статьи меня перекидывало в определенное место нужно прописать следующий параметр:
+    success_url = reverse_lazy('home')
 
-            '''
-            если форма не связа с базой данный:
-            try:
-                SportsGround.objects.create(**form.cleaned_data) 
-                return redirect('home')
-            except:
-                form.add_error(None, 'Error adding post')
-            '''
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs) # сначала мы должны поднять к зазовому классу и забрать
+        # все коллекции, которые уже сформированы. Такие как posts, title.
+        context['menu'] = menu
+        context['title'] = 'Add Page'
+        return context
 
-            # print(form.cleaned_data) # просто выведит в консоль данные, которые были введены в форму
-                                        # если они корректны.
-            return redirect('home')
-    else:
-        form = AddPostForm() # Формируется пустая форма
-    return render(request, 'my_page/addpage.html', {'form': form, 'menu': menu, 'title': 'Add page'})
+
+# def addpage(request):
+#     if request.method == 'POST':
+#         form = AddPostForm(request.POST, request.FILES) # Формируется форма с заполенными данными и получение фото.
+#         if form.is_valid():
+#             form.save()  # это сохранение если форма связанa c базой данных
+#
+#             '''
+#             если форма не связа с базой данный:
+#             try:
+#                 SportsGround.objects.create(**form.cleaned_data)
+#                 return redirect('home')
+#             except:
+#                 form.add_error(None, 'Error adding post')
+#             '''
+#
+#             # print(form.cleaned_data) # просто выведит в консоль данные, которые были введены в форму
+#                                         # если они корректны.
+#             return redirect('home')
+#     else:
+#         form = AddPostForm() # Формируется пустая форма
+#     return render(request, 'my_page/addpage.html', {'form': form, 'menu': menu, 'title': 'Add page'})
 
 
 def contact(request):
@@ -59,39 +96,73 @@ def contact(request):
 def login(request):
     return HttpResponse("Авторизация")
 
+class ShowSportsGround(DetailView):
+    model = SportsGround
+    template_name = 'my_page/SportsGround.html'
+    slug_url_kwarg = 'SportsGround_slug' # в старых версиях Джанго имя бралось не из файла url, а
+    # просто slug. Но в новых версиях эта проблема решена.
+    context_object_name = 'sports_ground'
 
-def show_sports_ground(request, SportsGround_slug):
-    sports_ground = get_object_or_404(SportsGround, slug=SportsGround_slug)
-
-    context = {
-        'sports_ground': sports_ground,
-        'menu': menu,
-        'title': sports_ground.title,
-        #     Я бы закомментировал cat_selected. Потому что
-        #     если этого не сделать, то если я захочу после выбора площадки ознакомитсья
-        # со всеми площадками города к которой относится выбранная площадка я этого сделать
-        # уже не смогу. Потому город станет простым текстом, а не ссылкой.
-        'cat_selected': sports_ground.city_id,
-    }
-    return render(request, 'my_page/SportsGround.html', context=context)
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs) # сначала мы должны поднять к зазовому классу и забрать
+        # все коллекции, которые уже сформированы. Такие как posts, title.
+        context['menu'] = menu
+        context['title'] = context['sports_ground']
+        return context
 
 
-def show_category(request, cat_slug):
-    city_obj = City.objects.filter(slug=cat_slug)
-    city_id = city_obj[0].pk
-    posts = SportsGround.objects.filter(city=city_id).filter(is_published=1)
+# def show_sports_ground(request, SportsGround_slug):
+#     sports_ground = get_object_or_404(SportsGround, slug=SportsGround_slug)
+#
+#     context = {
+#         'sports_ground': sports_ground,
+#         'menu': menu,
+#         'title': sports_ground.title,
+#         #     Я бы закомментировал cat_selected. Потому что
+#         #     если этого не сделать, то если я захочу после выбора площадки ознакомитсья
+#         # со всеми площадками города к которой относится выбранная площадка я этого сделать
+#         # уже не смогу. Потому город станет простым текстом, а не ссылкой.
+#         'cat_selected': sports_ground.city_id,
+#     }
+#     return render(request, 'my_page/SportsGround.html', context=context)
 
-    if len(posts) == 0:
-        raise Http404()
 
-    context = {
-        'posts': posts,
-        'menu': menu,
-        'title': 'Grounds in cities',
-        'cat_selected': city_id,
-    }
+class CityList(ListView):
+    model = SportsGround
+    template_name = 'my_page/index.html'
+    context_object_name = 'posts'
+    allow_empty = False # это как раз нам решит проблемы если нет площадок в выбраном городе.
+                        # и будет формировать ошибка 404.
 
-    return render(request, 'my_page/index.html', context=context)
+    def get_queryset(self):
+        return SportsGround.objects.filter(city__slug=self.kwargs['cat_slug'], is_published=True)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs) # сначала мы должны поднять к зазовому классу и забрать
+        # все коллекции, которые уже сформированы. Такие как posts, title.
+        context['menu'] = menu
+        context['title'] = 'City - ' + str(context['posts'][0].city) # очень опастно так делать. Потому что
+                                # если не будет плащадок в опеделенном городе, мы получим ошибку.
+
+        context['cat_selected'] = context['posts'][0].city_id
+        return context
+
+# def show_category(request, cat_slug):
+#     city_obj = City.objects.filter(slug=cat_slug)
+#     city_id = city_obj[0].pk
+#     posts = SportsGround.objects.filter(city=city_id).filter(is_published=1)
+#
+#     if len(posts) == 0:
+#         raise Http404()
+#
+#     context = {
+#         'posts': posts,
+#         'menu': menu,
+#         'title': 'Grounds in cities',
+#         'cat_selected': city_id,
+#     }
+
+    # return render(request, 'my_page/index.html', context=context)
 
 
 def all_project(request):

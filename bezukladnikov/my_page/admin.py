@@ -3,7 +3,9 @@ from django.contrib import admin
 from .models import *
 
 class SportsGroundAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'time_create', 'photo', 'is_published')
+    list_display = ('id', 'title', 'time_create', 'photo', 'is_published', 'city') # интересный момент связи таблиц
+    # если я укажу city то сработает связка и я получу название города, но если я напишу
+    # city_id я уже получу доступ именно значению данного атрибута из таблицы площадок. А именно просто цифру)
     list_display_links = ('id', 'title')
     search_fields = ('title', 'content')
     list_editable = ('is_published',)
