@@ -3,33 +3,42 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, CreateView
 from django.urls import reverse_lazy
 
+# чтобы закрыть доступ к странице нужно импортировать данный класс.
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+# чтобы закрыть доступ к странице нужно в том случае если представление сделано через
+# функуцию.
+# то надо использовать декоратор login_required.
+
 from .forms import *
 from .models import SportsGround, City
+from .utils import *
 
 COUNT_PROJECT = 5
 
-menu = [{'title': "About", 'url_name': "about"},
-        {'title': "Add Sport Ground", 'url_name': "add_page"},
-        {'title': "Feedback", 'url_name': "contact"},
-        {'title': "Sign in", 'url_name': "login"}
-        ]
 
 
-class MyPageHome(ListView):
+
+class MyPageHome(DataMixin, ListView):
     model = SportsGround
     template_name = 'my_page/index.html'
     context_object_name = 'posts' # Класс использует свою коллекцию данных и она называется object_list.
     # Но, так как у нас в index.html использутеся слово posts из старой функции, то нужно просто заменить
     # имя.
-    extra_context = {'title': 'Main page'} # но это только для передачи статической информации.
+    # extra_context = {'title': 'Main page'} # но это только для передачи статической информации.
     # для динамической информации такой как список меню ввержу нужно уже использовать функцию.
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs) # сначала мы должны поднять к зазовому классу и забрать
         # все коллекции, которые уже сформированы. Такие как posts, title.
-        context['menu'] = menu
-        context['cat_selected'] = 0
-        return context
+
+        # Если не создадвать класса Mixin, то надо прописать доп. атребуты.
+        # context['menu'] = menu
+        # context['cat_selected'] = 0
+
+        # Это уже с классом Mixin:
+        c_def = self.get_user_context(title="Main page")
+        return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
         return SportsGround.objects.filter(is_published=True)
@@ -50,20 +59,24 @@ def about(request):
     return render(request, 'my_page/about.html', {'menu': menu, 'title': 'About site'})
 
 
-class AddPage(CreateView):
+class AddPage(LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddPostForm
     template_name = 'my_page/addpage.html'
     # Джанго автоматическии через функцию get_url, которая прописана в модели.
     # Сформирует url для нового поста и перекинит меня туда. Но, если я хочу, чтобы после
     # добавления статьи меня перекидывало в определенное место нужно прописать следующий параметр:
     success_url = reverse_lazy('home')
+    login_url = reverse_lazy('home') # если неавторизованный пользователь попытвается добавить
+    # площадку его перекинет на главную страницу сайта.
 
+    # так же можно сгенерить ошибку 403 доступ запрещен.
+    # raise_exception = True
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs) # сначала мы должны поднять к зазовому классу и забрать
         # все коллекции, которые уже сформированы. Такие как posts, title.
-        context['menu'] = menu
-        context['title'] = 'Add Page'
-        return context
+        c_def = self.get_user_context(title="Add Page")
+        return dict(list(context.items()) + list(c_def.items()))
+
 
 
 # def addpage(request):
@@ -96,7 +109,7 @@ def contact(request):
 def login(request):
     return HttpResponse("Авторизация")
 
-class ShowSportsGround(DetailView):
+class ShowSportsGround(DataMixin, DetailView):
     model = SportsGround
     template_name = 'my_page/SportsGround.html'
     slug_url_kwarg = 'SportsGround_slug' # в старых версиях Джанго имя бралось не из файла url, а
@@ -106,9 +119,12 @@ class ShowSportsGround(DetailView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs) # сначала мы должны поднять к зазовому классу и забрать
         # все коллекции, которые уже сформированы. Такие как posts, title.
-        context['menu'] = menu
-        context['title'] = context['sports_ground']
-        return context
+        # context['menu'] = menu
+        # context['title'] = context['sports_ground']
+        # return context
+
+        c_def = self.get_user_context(title = context['sports_ground'])
+        return dict(list(context.items()) + list(c_def.items()))
 
 
 # def show_sports_ground(request, SportsGround_slug):
@@ -127,7 +143,7 @@ class ShowSportsGround(DetailView):
 #     return render(request, 'my_page/SportsGround.html', context=context)
 
 
-class CityList(ListView):
+class CityList(DataMixin, ListView):
     model = SportsGround
     template_name = 'my_page/index.html'
     context_object_name = 'posts'
@@ -140,12 +156,15 @@ class CityList(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs) # сначала мы должны поднять к зазовому классу и забрать
         # все коллекции, которые уже сформированы. Такие как posts, title.
-        context['menu'] = menu
-        context['title'] = 'City - ' + str(context['posts'][0].city) # очень опастно так делать. Потому что
-                                # если не будет плащадок в опеделенном городе, мы получим ошибку.
+        # context['menu'] = menu
+        # context['title'] = 'City - ' + str(context['posts'][0].city) # очень опастно так делать. Потому что
+        #                         # если не будет плащадок в опеделенном городе, мы получим ошибку.
+        #
+        # context['cat_selected'] = context['posts'][0].city_id
+        c_def = self.get_user_context(title='City - ' + str(context['posts'][0].city),
+                                      cat_selected=context['posts'][0].city_id)
 
-        context['cat_selected'] = context['posts'][0].city_id
-        return context
+        return dict(list(context.items()) + list(c_def.items()))
 
 # def show_category(request, cat_slug):
 #     city_obj = City.objects.filter(slug=cat_slug)

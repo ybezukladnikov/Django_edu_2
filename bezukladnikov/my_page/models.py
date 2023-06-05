@@ -20,7 +20,9 @@ class SportsGround(models.Model):
     class Meta:
         verbose_name = 'Sports Ground'
         verbose_name_plural = 'Sports Ground'
-        ordering = ['time_create', 'title']
+        ordering = ['time_create', 'title'] # при выполнении команды objects.all() данные
+        # будут отображаться уже отсортированными по полю создания, и потому уже по полю заголовок
+        # если тут указать знак "-" перед названием полем, то сортировка будет в обратном порядке.
 
 class City(models.Model):
     name = models.CharField(max_length=100, db_index=True, verbose_name='City')
