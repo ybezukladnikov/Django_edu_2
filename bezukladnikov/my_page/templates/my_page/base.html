@@ -75,6 +75,15 @@
 <!-- Блок контента -->
 	<div class="content-text">
 {% block content %}
+<nav class="list-pages">
+	<ul>
+		{% for p in paginator.page_range %}
+		<li class="page-num">
+			<a href="?page={{ p }}">{{ p }}</a>
+		</li>
+		{% endfor %}
+	</ul>
+</nav>
 {% endblock %}
 	</div>
 <!-- Конец блока контента -->
