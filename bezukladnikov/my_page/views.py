@@ -20,9 +20,6 @@ COUNT_PROJECT = 5
 
 
 class MyPageHome(DataMixin, ListView):
-    paginate_by = 3 # указываем количество элементов на одной странце. Это возможно, благодаря тому,
-    # что класс в ListView уже встроена Пагинация.
-
     model = SportsGround
     template_name = 'my_page/index.html'
     context_object_name = 'posts' # Класс использует свою коллекцию данных и она называется object_list.
