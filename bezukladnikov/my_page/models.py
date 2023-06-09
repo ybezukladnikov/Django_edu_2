@@ -38,3 +38,4 @@ class City(models.Model):
         verbose_name = 'City'
         verbose_name_plural = 'Cities'
         ordering = ['id',]
+

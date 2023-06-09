@@ -10,6 +10,7 @@ urlpatterns = [
     path('addpage/', AddPage.as_view(), name='add_page'),
     path('contact/', contact, name='contact'),
     path('login/', login, name='login'),
+    path('register/', RegisterUser.as_view(), name='register'),
     path('SportsGround/<slug:SportsGround_slug>/', ShowSportsGround.as_view(), name='SportsGround'),
     path('category/<slug:cat_slug>/', CityList.as_view(), name='category'),
     # path('project/', all_project, name='my_project'),
