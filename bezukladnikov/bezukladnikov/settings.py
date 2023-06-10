@@ -128,3 +128,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+# При логировании если прописывать данную переменную, то можно не делать
+# функцию get_success_url
+# после логирования пользователь попадет сразу на главную страницу.
+#LOGIN_REDIRECT_URL = '/'
