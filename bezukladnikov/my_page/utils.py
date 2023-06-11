@@ -12,7 +12,7 @@ menu = [{'title': "About", 'url_name': "about"},
 
 
 class DataMixin:
-    paginate_by = 3 # указываем количество элементов на одной странце. Это возможно, благодаря тому,
+    paginate_by = 2 # указываем количество элементов на одной странце. Это возможно, благодаря тому,
     # что класс в ListView уже встроена Пагинация.
     def get_user_context(self, **kwargs):
         context = kwargs

@@ -44,7 +44,11 @@ class MyPageHome(DataMixin, ListView):
         return dict(list(context.items()) + list(c_def.items()))
 
     def get_queryset(self):
-        return SportsGround.objects.filter(is_published=True)
+        # select_related('city') Это жадный запрос.
+        # это сделано, чтобы уменьшить количество SQL запросов к базе данных.
+        # Что при отображении площадки на странице нам лишний раз не обращаться к базе
+        # за названием категории.
+        return SportsGround.objects.filter(is_published=True).select_related('city')
 
 # def index(request):
 #     # posts = SportsGround.objects.all()
@@ -154,7 +158,7 @@ class CityList(DataMixin, ListView):
                         # и будет формировать ошибка 404.
 
     def get_queryset(self):
-        return SportsGround.objects.filter(city__slug=self.kwargs['cat_slug'], is_published=True)
+        return SportsGround.objects.filter(city__slug=self.kwargs['cat_slug'], is_published=True).select_related('city')
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs) # сначала мы должны поднять к зазовому классу и забрать
