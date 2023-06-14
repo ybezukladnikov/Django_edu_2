@@ -9,6 +9,7 @@ pillow = "*"
 ipython = "*"
 django-extensions = "*"
 django-debug-toolbar = "*"
+django-simple-captcha = "*"
 
 [dev-packages]
 

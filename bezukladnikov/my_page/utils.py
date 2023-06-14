@@ -4,6 +4,7 @@ He will content shere atribute.
 '''
 from .models import *
 from django.db.models import Count
+from django.core.cache import cache
 
 menu = [{'title': "About", 'url_name': "about"},
         {'title': "Add Sport Ground", 'url_name': "add_page"},
@@ -17,7 +18,14 @@ class DataMixin:
     def get_user_context(self, **kwargs):
         context = kwargs
         # city = City.objects.all()
-        city = City.objects.annotate(Count('sportsground'))
+        # Но мы будем кэшировать на уровни API
+        city = cache.get('city')
+        if not city:
+            city = City.objects.annotate(Count('sportsground')) # нужно помнить, что это ленивые SQL запросы.
+        # то есть реальный запрос к БД будет только в момент отображения странички. Поэтому, кеширование на уровне
+        # шаблона реализовано в html странице.
+            cache.set('city', city, 60)
+
 
         # лучше конечно просто не показывать все меню неавторизованному пользователю
         # и мы можем убрать пункт меню с добавлением площадки если пользователь
